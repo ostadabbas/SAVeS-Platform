@@ -16,4 +16,4 @@ We provide scripts to process following datasets, with more supports coming alon
 |KITTI [⇱](https://www.cvlibs.net/datasets/kitti/eval_odometry.php)                    |CARLA [⇱](https://carla.org/)               |
 
 We are also providing guides on evaluating the results.
-This paltform is under development. 
+<!-- This paltform is under development.  -->
