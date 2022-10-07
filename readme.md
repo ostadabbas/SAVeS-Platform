@@ -40,4 +40,7 @@ Similarly, out output is
 $$RPE=\dfrac{1}{n-1}\sum_{i,j=i+1}{\|trans(E_{i,j})\|}$$
 $\|trans(\bullet)\|$
 stands for Euclidean Distance.
+
+Here are some demo images that our platform can achieve:
+![linked](https://github.com/ostadabbas/SAVeS-Platform/blob/master/Demo%20Images/linked.png)
 <!-- This paltform is under development.  -->
