@@ -34,8 +34,8 @@ where $P_{ref,i}$ and $P_{est,i}$ are poses, and $\ominus$ is invert positional 
 Hence, we calculate $APE_i$ by applying L2-norm to the translation part of $E_i$, and the output result is the mean of all participating frames:
 $$APE=\dfrac{1}{n}\sum_i{\|trans(E_i)\|}$$
 * Absolute Pose Error (\%): this indicator measures the ratio of the APE to the length of the trajectory. Since we only aligned the origin of the trajectory, the longer the vehicle travels without loop closure, the higher the drift accumulates. The percentage eliminates the difference of traveling distance.
-* Relative Pose Error (m): RPE reflects local consistency of the trajectory, which compares the pose transition between 2 consecutive frames between estimation and reference:
-$$E_{i,j}=\delta_{est_{i,j}}\ominus\delta_{ref_{i,j}}=(P^{-1}_{ref,i}P_{ref,j})^{-1}(P_{est,i}^{-1}P_{est,j})$$
+* Relative Pose Error (m): RPE reflects local consistency of the trajectory, which compares the pose transition between 2 consecutive frames between estimation and reference:\
+$$E_{i,j}=\delta_{est_{i,j}}\ominus\delta_{ref_{i,j}}=(P_{ref,i}^{-1} P_{ref,j})^{-1}(P_{est,i}^{-1}P_{est,j})$$
 Similarly, out output is
 $$RPE=\dfrac{1}{n-1}\sum_{i,j=i+1}{\|trans(E_{i,j})\|}$$
 $\|trans(\bullet)\|$
