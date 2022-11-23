@@ -44,3 +44,26 @@ stands for Euclidean Distance.
 Here are some demo images that our platform can achieve:
 ![linked](https://github.com/ostadabbas/SAVeS-Platform/blob/master/Demo%20Images/linked.png)
 <!-- This paltform is under development.  -->
+
+How to use the geometric generation and analysis tool (Ubuntu 18.04):
+1. Setup ROS Melodic according to the instruction[⇱](http://wiki.ros.org/melodic/Installation/Ubuntu)
+2. Setup A-LOAM according to instruction[⇱](https://github.com/HKUST-Aerial-Robotics/A-LOAM)
+3. Download LeGO-LOAM[⇱](https://github.com/RobustFieldAutonomyLab/LeGO-LOAM)
+4. Modify src/LeGO-LOAM/include/utility.h for your desired lidar and loop closure configuration. For CARLA and KITTI dataset, use Ouster-64 configuration. Set ```useCloudRing``` to ```false``` and uncomment line 159 in imageProjection.cpp.
+5. Replace mapOptmization.cpp with the one provided from the link (link currently under construction) and use installation instruction on their website to install.
+6. Download pre-made ROS bag files or use your own bag (link currently under construction)
+7. In your desired location, run the following command:
+```bash
+git clone https://github.com/ostadabbas/SAVeS-Platform/
+cd SAVeS-Platform
+pip install -r requirements.txt
+```
+8. Use
+```bash
+python3 geometric_ui.py
+```
+for trajectory generation, and 
+```bash
+python3 geo_analysis_ui.py
+```
+for result analysis.
