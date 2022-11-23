@@ -1,5 +1,6 @@
 tk==0.1.0
 scipy==1.5.4
 pandas==1.1.5
-bagpy=0.5
+bagpy==0.5
+matplotlib==3.3.4
 

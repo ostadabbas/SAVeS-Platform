@@ -6,8 +6,10 @@ from tkinter import filedialog as fd
 import time
 from util import *
 import os
+import json
 
 from extract_from_bag import bag_transform
+from geo_analysis import geo_ana
 
 class args_pl():
     def __init__(self,bag_file,model,datasets,output_location):
@@ -114,7 +116,24 @@ class geo_ana_frame(Frame):
                 tkinter.messagebox.showinfo('Error','Bag file does not match with model.')
 
     def start_analysis(self):
-        print(self.check_ape)
+        gt_file = self.gt_txt.get()
+        pred_file = self.pred_txt.get()
+        if not os.path.exists(gt_file):
+            tkinter.messagebox.showinfo('Error','Not valid ground truth path!')
+            return
+        if not os.path.exists(pred_file):
+            tkinter.messagebox.showinfo('Error','Not valid prediction path!')
+            return
+        res = geo_ana(gt_file,pred_file,self.is_rpe.get(),self.is_ape.get(),self.is_align.get(),self.is_plot.get())
+        if res == False:
+            tkinter.messagebox.showinfo('Error','An error occured, please refer to commandline output')
+            return
+        disp = json.dumps(res)
+        cmd_window = tk.Toplevel()
+        cmd_window.wm_title("Analysis Result")
+        t = Text(cmd_window)
+        t.insert(tk.END, disp)
+        
 
 
 
