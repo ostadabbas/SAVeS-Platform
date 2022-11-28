@@ -22,3 +22,15 @@ def browse_file(show_widget,ext_desc,ext,start_dir='~/Downloads'):
     show_widget.delete(0,END)
     show_widget.insert(0,filename)
     return filename
+
+def checkmark(parent,val):
+    if not val:
+        return Label(parent,text="✕",fg='red')
+    else:
+        return Label(parent,text="✓",fg='green')
+
+def set_checkmark(show_widget,set_val):
+    if not set_val:
+        show_widget.configure(text="✕",fg='red')
+    else:
+        show_widget.configure(text="✓",fg='green')
