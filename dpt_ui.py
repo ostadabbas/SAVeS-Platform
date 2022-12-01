@@ -13,7 +13,7 @@ class dpt_ui(lbm_model_ui):
         dpt_loc_label.grid(row=0,column=0,columnspan=3,sticky='w')
         dpt_loc_txt = Entry(tab)
         dpt_loc_txt.grid(row=1,column=0,columnspan=3,sticky='ew')
-        dpt_loc_btn = Button(tab,text="Browse...")
+        dpt_loc_btn = Button(tab,text="Browse...",command=lambda:browse_folder(dpt_loc_txt))
         dpt_loc_btn.grid(row=1,column=3)
         dpt_loc_mark = checkmark(tab,False)
         dpt_loc_mark.grid(row=1,column=4)
@@ -22,7 +22,8 @@ class dpt_ui(lbm_model_ui):
         self.hybrid_val = StringVar()
 
         self.dpt_finetune_combo = ttk.Combobox(tab,state="readonly",\
-            values=["dpt_hybrid_kitti","dpt_hybrid_nyu"])
+            values=["No fine-tuning","dpt_hybrid_kitti","dpt_hybrid_nyu"])
+        self.dpt_finetune_combo.current(0)
         self.dpt_finetune_combo.grid(row=2,column=1,columnspan=3,sticky='ew')
         dpt_scale_combo = ttk.Combobox(tab,state="readonly",\
             values=["dpt_hybrid","dpt_large"],textvariable=self.scale_val)
@@ -35,7 +36,7 @@ class dpt_ui(lbm_model_ui):
         dpt_pretrain_label.grid(row=3,column=0,columnspan=3,sticky='w')
         dpt_pretrain_txt = Entry(tab)
         dpt_pretrain_txt.grid(row=4,column=0,columnspan=3,sticky='ew')
-        dpt_pretrain_btn = Button(tab,text="Browse...")
+        dpt_pretrain_btn = Button(tab,text="Browse...",command=lambda:self.load_pretrain(dpt_pretrain_txt,"pt"))
         dpt_pretrain_btn.grid(row=4,column=3)
         dpt_pretrain_mark = checkmark(tab,False)
         dpt_pretrain_mark.grid(row=4,column=4)

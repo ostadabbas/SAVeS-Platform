@@ -39,3 +39,9 @@ class lbm_model_ui:
             widgets.append(checkmark(cmd_window,val))
             widgets[-1].pack(side=LEFT)
 
+    def load_pretrain(self,show_widget,ext):
+        # this function works for single weight file (pth) only
+        # for DPT, its pt file and for AdaBins its pth
+        file_path = browse_file(show_widget,"PyTorch weight file",ext)
+        self.single_pretrain = file_path
+

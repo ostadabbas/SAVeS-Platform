@@ -5,6 +5,7 @@ import tkinter.messagebox
 from tkinter import filedialog as fd
 from util import *
 from lbm_model_ui import lbm_model_ui
+import os
 
 class geonet_test_ui(lbm_model_ui):
     def __init__(self, tab):
@@ -13,20 +14,20 @@ class geonet_test_ui(lbm_model_ui):
         geo_loc_label.grid(row=0,column=0,columnspan=2,sticky='w')
         geo_loc_txt = Entry(tab)
         geo_loc_txt.grid(row=1,column=0,columnspan=4,sticky='ew')
-        geo_loc_btn = Button(tab,text="Browse...")
+        geo_loc_btn = Button(tab,text="Browse...",command=lambda:browse_folder(geo_loc_txt))
         geo_loc_btn.grid(row=1,column=4)
         geo_loc_mark = checkmark(tab,False)
         geo_loc_mark.grid(row=1,column=5)
 
-        geo_pretrain_combo = ttk.Combobox(tab,state="readonly",\
+        self.geo_pretrain_combo = ttk.Combobox(tab,state="readonly",\
             values=["Standard (model)","Scale Normalization (model_sn)"],width=25)
-        geo_pretrain_combo.current(0)
-        geo_pretrain_combo.grid(row=3,column=2,columnspan=2,sticky='ew')
+        self.geo_pretrain_combo.current(0)
+        self.geo_pretrain_combo.grid(row=3,column=2,columnspan=2,sticky='ew')
         geo_pretrain_label = Label(tab,text="Please select the folder that contains pretrained weights:")
         geo_pretrain_label.grid(row=2,column=0,columnspan=2,sticky='w')
-        geo_pretrain_txt = Entry(tab)
-        geo_pretrain_txt.grid(row=3,column=0,columnspan=2,sticky='ew')
-        geo_pretrain_btn = Button(tab,text="Browse...")
+        self.geo_pretrain_txt = Entry(tab)
+        self.geo_pretrain_txt.grid(row=3,column=0,columnspan=2,sticky='ew')
+        geo_pretrain_btn = Button(tab,text="Browse...", command=lambda:self.load_pretrain_folder())
         geo_pretrain_btn.grid(row=3,column=4)
         geo_pretrain_mark = checkmark(tab,False)
         geo_pretrain_mark.grid(row=3,column=5)
@@ -52,6 +53,23 @@ class geonet_test_ui(lbm_model_ui):
         self.geo_env_mark.grid(row=6,column=1,sticky='w')
         geo_start_btn = Button(tab,text="Start")
         geo_start_btn.grid(row=6,column=5,sticky='w')
+
+    def load_pretrain_folder(self):
+        fldr_loc = browse_folder(self.geo_pretrain_txt)
+        # obtain users' model choice
+        choice = self.geo_pretrain_combo.get()
+        if choice == "Standard (model)":
+            if not os.path.exists(os.path.join(fldr_loc,"model.meta")):
+                tkinter.messagebox.showinfo('Error','Model pretrain file does not exist!')
+                return
+            self.single_pretrain = os.path.join(fldr_loc,"model")
+        elif choice == "Scale Normalization (model_sn)":
+            if not os.path.exists(os.path.join(fldr_loc,"model_sn.meta")):
+                tkinter.messagebox.showinfo('Error','Model pretrain file does not exist!')
+                return
+            self.single_pretrain = os.path.join(fldr_loc,"model_sn")
+        else:
+            tkinter.messagebox.showinfo('Error','Model pretrain file does not exist!')
 
     def check_envs(self):
         # for GeoNet to work, you are required to have:
