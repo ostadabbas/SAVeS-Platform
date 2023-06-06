@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import filedialog as fd
 import subprocess
 import re
+import numpy as np
 
 def set_entry_txt(entry_widget,txt):
     entry_widget.delete(0,END)
@@ -75,3 +76,9 @@ def get_python_version():
     except Exception as e:
         print(e)
         return -1
+    
+def scale_matching(gt,pred):
+    scalor = np.median(gt[gt>0]) / np.median(pred[gt>0])
+    new_res = pred.astype('float32') * scalor
+    new_res[new_res>2**16-1]=2**16-1
+    return new_res
