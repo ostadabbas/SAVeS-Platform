@@ -45,13 +45,13 @@ class depth_ana_ui:
     def extract_img(self,extract_loc=None):
         if self.npy_loc_txt.get() == "":
             print("empty container")
-            top = tk.Toplevel()
-            top.wm_title("Output Name")
-            top.protocol("WM_DELETE_WINDOW", self.on_close)
-            top.update()
-            time.sleep(5)
-            # do something time consuming but exact time can't be determined
-            top.destroy()
+        top = tk.Toplevel()
+        top.wm_title("Halt")
+        top.protocol("WM_DELETE_WINDOW", self.on_close)
+        wait_label = Label(top, text="Extraction in progress, this window will close itself when done.")
+        wait_label.grid(row=0,column=0)
+        top.update()
+        # do something time consuming but exact time can't be determined
             
         if extract_loc is None:
             fldr_name = self.npy_loc_txt.get().split("/")[-1] + "_extract"
@@ -87,6 +87,8 @@ class depth_ana_ui:
 
         for th_ct in range(thread_ct):
             threads_handle[th_ct].join()
+            
+        top.destroy()
     
     def on_close(self):
         # Do nothing here to prevent the user from closing the window
