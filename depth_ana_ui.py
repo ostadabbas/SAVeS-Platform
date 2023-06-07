@@ -6,12 +6,13 @@ from tkinter import filedialog as fd
 from util import *
 import os
 import numpy as np
-from PIL import Image
+from PIL import Image,ImageTk
 import imageio
 import cv2
 import math
 import threading
 import time
+import shlex
 
 class depth_ana_ui:
     def __init__(self, tab) -> None:
@@ -20,6 +21,9 @@ class depth_ana_ui:
         if not os.path.exists("./kitti_eval_tools/evaluate_depth"):
             tkinter.messagebox.showinfo('Error','KITTI Evaluation toolchain not detected! Program will not work!')
         self.dest_fldr = None
+        self.cut_head = False
+        img = Image.open("./images/warn.png")
+        self.img = ImageTk.PhotoImage(img)
         npy_loc_label = Label(tab,text="Please select depth prediction file (*.npy):")
         npy_loc_label.grid(row=0,column=0,columnspan=2,sticky='w')
         self.npy_loc_txt = Entry(tab)
@@ -41,24 +45,32 @@ class depth_ana_ui:
 
         self.extract_btn = Button(tab,text="Extract",command=lambda:self.extract_img())
         self.extract_btn.grid(row=5,column=0)
+        next_label = Label(tab,text=">>>>>>>>>>>>>>>>>>>>>>>")
+        next_label.grid(row=5,column=1)
+        self.analysis_btn = Button(tab,text="Analysis",command=lambda:self.call_kitti())
+        self.analysis_btn.grid(row=5,column=2)
     
     def extract_img(self,extract_loc=None):
-        if self.npy_loc_txt.get() == "":
+        if self.npy_loc_txt.get() == "" or self.gt_loc_txt.get() == "":
             print("empty container")
+            return
         top = tk.Toplevel()
         top.wm_title("Halt")
         top.protocol("WM_DELETE_WINDOW", self.on_close)
+        wait_img = Label(top,image=self.img)
+        wait_img.image = self.img
+        wait_img.grid(row=0,column=0)
         wait_label = Label(top, text="Extraction in progress, this window will close itself when done.")
-        wait_label.grid(row=0,column=0)
+        wait_label.grid(row=1,column=0)
         top.update()
         # do something time consuming but exact time can't be determined
             
         if extract_loc is None:
-            fldr_name = self.npy_loc_txt.get().split("/")[-1] + "_extract"
-            fldr_path = os.path.join(".","extracted",fldr_name)
-            if not os.path.exists(fldr_path):
-                os.makedirs(fldr_path)
-            self.dest_fldr = fldr_path
+            self.fldr_name = self.npy_loc_txt.get().split("/")[-1] + "_extract"
+            self.fldr_path = os.path.join(".","extracted",self.fldr_name)
+            if not os.path.exists(self.fldr_path):
+                os.makedirs(self.fldr_path)
+            self.dest_fldr = self.fldr_path
         else:
             self.dest_fldr = extract_loc
 
@@ -74,12 +86,20 @@ class depth_ana_ui:
         #     name_arr = f.readlines()
         # tkinter.messagebox.showinfo('Attention','This window will close itself when extraction is finished!')
         for th_ct in range(thread_ct):
-            start = 5 + th_ct * each_thread_ct
-            end = 5+(th_ct+1)*each_thread_ct
-            # for the last thread
-            if th_ct == thread_ct-1:
-                if end != self.num_img - 5:
-                    end = self.num_img - 5
+            if self.cut_head:
+                start = 5 + th_ct * each_thread_ct
+                end = 5+(th_ct+1)*each_thread_ct
+                # for the last thread
+                if th_ct == thread_ct-1:
+                    if end != self.num_img - 5:
+                        end = self.num_img - 5
+            else:
+                start = th_ct * each_thread_ct
+                end = (th_ct+1)*each_thread_ct
+                # for the last thread
+                if th_ct == thread_ct-1:
+                    if end != self.num_img:
+                        end = self.num_img
             print(start,end)
             
             threads_handle.append(threading.Thread(target=self.__open_and_cvt,args=(self.gt_loc_txt.get(),start,end,name_arr,)))
@@ -107,6 +127,9 @@ class depth_ana_ui:
     def validate_ct(self,is_npy):
         if is_npy:
             browse_file(self.npy_loc_txt,"Numpy File","npy")
+            self.fldr_name = self.npy_loc_txt.get().split("/")[-1] + "_extract"
+            self.fldr_path = os.path.join(".","extracted",self.fldr_name)
+            self.dest_fldr = self.fldr_path
         else:
             browse_folder(self.gt_loc_txt)
         try:
@@ -121,8 +144,46 @@ class depth_ana_ui:
             gt_len = 0
         if pred_len != 0 and gt_len != 0:
             if pred_len == gt_len:
+                self.cut_head = False
                 set_checkmark(self.ct_eql_mark, True)
+            elif pred_len == (gt_len + 10):
+                set_checkmark(self.ct_eql_mark, True)
+                self.cut_head = True
         
         ct_str = "{} images from prediction file, {} in ground truth folder".format(pred_len,gt_len)
         self.ct_desc_label.config(text=ct_str)
+
+    def call_kitti(self):
+        pred_pth = self.dest_fldr
+        gt_pth = self.gt_loc_txt.get()
+        exec_command = "bash -c './kitti_eval_tools/evaluate_depth {} {}'".format(gt_pth,pred_pth)
+        exec_command = shlex.split(exec_command)
+        
+        try:
+            top = tk.Toplevel()
+            top.wm_title("Halt")
+            top.protocol("WM_DELETE_WINDOW", self.on_close)
+            wait_label = Label(top,image=self.img)
+            wait_label.image = self.img
+            wait_label.grid(row=0,column=0)
+            wait_label2 = Label(top,text="Analysis in progress, this window will close itself when done.")
+            wait_label2.grid(row=1,column=0)
+            top.update()
+            proc = subprocess.check_output(exec_command,stderr=subprocess.STDOUT)
+            top.destroy()
+            print(proc.decode("utf-8").split('\n')[-12:])
+            stats_str = ""
+            with open(os.path.join(pred_pth,"stats_depth.txt"),'r') as f:
+                stats = f.readlines()
+                for idx, items in enumerate(stats):
+                    stats_str += items
+            results_wd = tk.Toplevel()
+            results_wd.wm_title("The results are in!")
+            stats_text = tkinter.Text(results_wd)
+            stats_text.insert(tkinter.END, stats_str)
+            stats_text.grid(row=0,column=0)
+
+        except Exception as e: 
+            print(e)
+        
         
