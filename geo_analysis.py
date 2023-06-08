@@ -2,8 +2,12 @@ from evo.core import metrics
 from evo.tools import file_interface
 import matplotlib.pyplot as plt
 from evo.tools import plot
+import copy
 
 def geo_ana(gt_file,pred_file,do_rpe,do_ape,do_align,do_plot):
+    pose_relation = metrics.PoseRelation.translation_part
+    delta = 1
+    delta_unit = metrics.Unit.frames
     traj_ref = file_interface.read_kitti_poses_file(gt_file)
     traj_est = file_interface.read_kitti_poses_file(pred_file)
     scene_len = traj_ref.get_infos()["path length (m)"]
@@ -13,7 +17,8 @@ def geo_ana(gt_file,pred_file,do_rpe,do_ape,do_align,do_plot):
         return False
     traj_est_aligned = copy.deepcopy(traj_est)
     if do_align:
-        traj_est_aligned.align_origin(traj_ref)
+        # traj_est_aligned.align_origin(traj_ref)
+        traj_est_aligned.align(traj_ref,n=10)
     data = (traj_ref, traj_est_aligned)
     if do_plot:
         fig = plt.figure()
