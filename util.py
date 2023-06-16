@@ -82,3 +82,13 @@ def scale_matching(gt,pred):
     new_res = pred.astype('float32') * scalor
     new_res[new_res>2**16-1]=2**16-1
     return new_res
+
+def show_env_result(res_dict):
+    cmd_window = Toplevel()
+    cmd_window.wm_title("Check Result")
+    widgets = []
+    for cont,val in res_dict.items():
+        widgets.append(Label(cmd_window,text=cont))
+        widgets[-1].pack(side=LEFT)
+        widgets.append(checkmark(cmd_window,val))
+        widgets[-1].pack(side=LEFT)
