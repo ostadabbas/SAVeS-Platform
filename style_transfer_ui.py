@@ -26,9 +26,9 @@ class style_frame(Frame):
         self.load_vsait_label = Label(self.load_sep,text="Please Select VSAIT Installation Location:")
         self.load_vsait_label.grid(row=0,column=0)
         self.load_vsait_entry = Entry(self.load_sep)
-        self.load_vsait_entry.grid(row=1,column=0,sticky="ew")
+        self.load_vsait_entry.grid(row=1,column=0,sticky="ew",columnspan=2)
         self.load_vsait_btn = Button(self.load_sep,text="Browse...",command=lambda:browse_folder(self.load_vsait_entry))
-        self.load_vsait_btn.grid(row=1,column=1)
+        self.load_vsait_btn.grid(row=1,column=2)
         self.chk_env_btn = Button(self.load_sep,text="Check Environments",command=lambda:self.check_envs())
         self.chk_env_btn.grid(row=2,column=0,sticky="w")
         self.env_chkmark = checkmark(self.load_sep,False)
@@ -65,11 +65,11 @@ class style_frame(Frame):
             else:
                 res_dict["CUDA {}".format(cudav)] = True
         if tfv == -1:
-            res_dict["PyTorch 1.11.x"] = False
+            res_dict["PyTorch >= 1.11.x"] = False
             model_env_ready = False
         else:
-            if tfv[:4] != "1.11":
-                res_dict["PyTorch 1.11.x"] = False
+            if float(tfv[:4]) <= 1.11:
+                res_dict["PyTorch >= 1.11.x"] = False
                 model_env_ready = False
             else:
                 res_dict["Pytorch {}".format(tfv)] = True
@@ -93,7 +93,7 @@ class style_frame(Frame):
         show_env_result(res_dict)
         set_checkmark(self.env_chkmark,model_env_ready)
         self.__hide_all_tabs(not model_env_ready)
-
+        self.vsait_test.update_vsait_loc(self.load_vsait_entry.get())
 
 if __name__ == '__main__':
     style_frame().mainloop()
