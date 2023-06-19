@@ -7,6 +7,7 @@ import time
 from util import *
 import os
 from styled.test_ui import style_test_ui
+from styled.train_ui import style_train_ui
 
 class style_frame(Frame):
     def __init__(self):
@@ -19,6 +20,7 @@ class style_frame(Frame):
         self.tab_test = Frame(self.tabsystem)
 
         self.vsait_test = style_test_ui(self.tab_test)
+        self.vsait_train = style_train_ui(self.tab_train)
 
         self.load_sep = ttk.Labelframe(self, text='VSAIT Configure')
         self.load_sep.pack(expand=1,fill="both")

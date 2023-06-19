@@ -92,3 +92,8 @@ def show_env_result(res_dict):
         widgets[-1].pack(side=LEFT)
         widgets.append(checkmark(cmd_window,val))
         widgets[-1].pack(side=LEFT)
+
+def add_placeholder_to(entry, placeholder):
+    entry.insert(0, placeholder)
+    entry.bind('<FocusIn>', lambda event: entry.delete('0', 'end'))
+    entry.bind('<FocusOut>', lambda event: entry.insert(0, placeholder) if not entry.get() else None)

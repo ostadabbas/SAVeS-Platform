@@ -23,7 +23,7 @@ class analysis_frame(Frame):
         self.tabsystem.add(self.tab_loam, text='Odometry')
         self.tabsystem.add(self.tab_depth, text='Depth')
         self.tabsystem.pack(expand=1, fill="both")
-        self.odo_link = Button(self.tab_loam,text="Open Geomeric Algorithm Analysis in a New Window",command=lambda:self.open_geo_ana())
+        self.odo_link = Button(self.tab_loam,text="Open Geomeric Algorithm Analysis in a New Window ⇱",command=lambda:self.open_geo_ana())
         self.odo_link.pack(side=TOP)
 
     def open_geo_ana(self):
