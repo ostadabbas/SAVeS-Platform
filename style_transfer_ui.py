@@ -96,6 +96,7 @@ class style_frame(Frame):
         set_checkmark(self.env_chkmark,model_env_ready)
         self.__hide_all_tabs(not model_env_ready)
         self.vsait_test.update_vsait_loc(self.load_vsait_entry.get())
+        self.vsait_train.update_vsait_loc(self.load_vsait_entry.get())
 
 if __name__ == '__main__':
     style_frame().mainloop()

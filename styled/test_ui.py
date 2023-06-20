@@ -62,13 +62,14 @@ class style_test_ui:
             dest_fldr = os.path.join(self.vsait_loc,"data","source")
             dest_fldr_val = os.path.join(dest_fldr,"val")
             self.progress["maximum"] = 100
-            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-            if not os.path.exists(dest_fldr_val):
-                os.makedirs(dest_fldr_val)
-            else:
-                # os.rename(dest_fldr_val,os.path.join(dest_fldr,"val_bkup_"+time.))
-                os.rename(dest_fldr_val, f"{dest_fldr_val}_{timestamp}")
-                os.makedirs(dest_fldr_val)
+            # timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            # if not os.path.exists(dest_fldr_val):
+            #     os.makedirs(dest_fldr_val)
+            # else:
+            #     # os.rename(dest_fldr_val,os.path.join(dest_fldr,"val_bkup_"+time.))
+            #     os.rename(dest_fldr_val, f"{dest_fldr_val}_{timestamp}")
+            #     os.makedirs(dest_fldr_val)
+            check_make_folder(dest_fldr_val)
             # all ready to copy
             idx = 0
             png_files = glob.glob(f"{source_fldr}/*.png")

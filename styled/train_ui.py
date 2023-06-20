@@ -1,9 +1,11 @@
 from tkinter import *
 from tkinter import ttk
 from util import *
+import tkinter.messagebox
 from PIL import Image,ImageTk,ImageOps
 import glob
 import os
+import shutil
 
 
 class style_train_ui:
@@ -12,7 +14,7 @@ class style_train_ui:
         content_label.grid(row=0,column=0)
         self.content_txt = Entry(tab)
         self.content_txt.grid(row=1,column=0,sticky="ew",columnspan=2)
-        
+        self.vsait_loc = None
 
         style_label = Label(tab,text="Please select target dataset (style) location")
         style_label.grid(row=2,column=0)
@@ -22,7 +24,7 @@ class style_train_ui:
         self.train_name_txt = Entry(tab)
         add_placeholder_to(self.train_name_txt,"Enter name for this weight")
         self.train_name_txt.grid(row=4,column=0,sticky="ew",columnspan=2)
-        self.load_btn = Button(tab,text="Load Images")
+        self.load_btn = Button(tab,text="Load Images",command=lambda:self.copy_to_dest())
         self.load_btn.grid(row=5,column=0,sticky="w")
         self.progress = ttk.Progressbar(tab, orient="horizontal")
         self.progress.grid(row=5,column=0,sticky="e",columnspan=2)
@@ -69,3 +71,36 @@ class style_train_ui:
         label_img = ImageTk.PhotoImage(show_img)
         img_widget.image = label_img
         img_widget.config(image=label_img)
+
+    def update_vsait_loc(self,loc):
+        self.vsait_loc = loc
+
+    def copy_to_dest(self):
+        if self.vsait_loc is None:
+            tkinter.messagebox.showinfo('Error','Style Trasnfer Location Not Selected!')
+            return
+        dest_target_style_loc = os.path.join(self.vsait_loc,"data","target","train")
+        dest_source_content_loc = os.path.join(self.vsait_loc,"data","source","train")
+        check_make_folder(dest_source_content_loc)
+        check_make_folder(dest_target_style_loc)
+        # first do content
+        idx = 0
+        source_fldr = self.content_txt.get()
+        png_files = glob.glob(f"{source_fldr}/*.png")
+        sty_png_files = glob.glob(f"{self.style_txt.get()}/*.png")
+        count = len(png_files) + len(sty_png_files)
+        for pngfile in glob.iglob(os.path.join(source_fldr, "*.png")):
+            shutil.copy(pngfile, dest_source_content_loc)
+            perc = int(idx*100 / count)
+            self.progress["value"] = perc
+            self.progress.update()
+            self.content_count.config(text="{} image(s)".format(idx))
+            idx += 1
+        for sty_png_file in glob.iglob(os.path.join(self.style_txt.get(), "*.png")):
+            shutil.copy(sty_png_file, dest_target_style_loc)
+            perc = int(idx*100 / count)
+            self.progress["value"] = perc
+            self.progress.update()
+            self.style_count.config(text="{} image(s)".format(idx))
+            idx += 1
+        self.start_btn.config(state=NORMAL)

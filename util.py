@@ -3,6 +3,8 @@ from tkinter import filedialog as fd
 import subprocess
 import re
 import numpy as np
+import os
+from datetime import datetime
 
 def set_entry_txt(entry_widget,txt):
     entry_widget.delete(0,END)
@@ -97,3 +99,12 @@ def add_placeholder_to(entry, placeholder):
     entry.insert(0, placeholder)
     entry.bind('<FocusIn>', lambda event: entry.delete('0', 'end'))
     entry.bind('<FocusOut>', lambda event: entry.insert(0, placeholder) if not entry.get() else None)
+
+def check_make_folder(folder_to_check):
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    if not os.path.exists(folder_to_check):
+        os.makedirs(folder_to_check)
+    else:
+        # os.rename(dest_fldr_val,os.path.join(dest_fldr,"val_bkup_"+time.))
+        os.rename(folder_to_check, f"{folder_to_check}_{timestamp}")
+        os.makedirs(folder_to_check)
