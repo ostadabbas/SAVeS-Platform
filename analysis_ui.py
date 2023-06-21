@@ -1,12 +1,9 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
-import tkinter.messagebox
-from tkinter import filedialog as fd
-import time
 
-from depth_ana_ui import depth_ana_ui
-from geo_analysis_ui import geo_ana_frame
+from analysis.depth_ana_ui import depth_ana_ui
+from analysis.geo_analysis_ui import geo_ana_frame
 
 class analysis_frame(Frame):
     def __init__(self):

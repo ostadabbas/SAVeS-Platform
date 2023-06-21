@@ -9,7 +9,7 @@ import os
 import json
 
 from extract_from_bag import bag_transform
-from geo_analysis import geo_ana
+from analysis.geo_analysis import geo_ana
 import numpy as np
 import copy
 
@@ -104,8 +104,15 @@ class geo_ana_frame(Frame):
         self.is_plot = BooleanVar()
         self.check_plot = Checkbutton(self.options_sep, text='Plot Trajectory',variable=self.is_plot)
         self.check_plot.grid(row=14,column=1,sticky='w')
+        self.do_ts_align = BooleanVar()
+        self.check_ts = Checkbutton(self.options_sep,text='Align Timestamps',\
+                                    variable=self.do_ts_align,command=lambda:self.show_ts_selection_window())
+        self.check_ts.grid(row=13,column=2,sticky="w")
         check_start_btn = Button(self.ana_sep,text="Start",command=lambda:self.start_analysis())
         check_start_btn.grid(row=15,column=2)
+
+        self.gt_ts_file = ""
+        self.pred_ts_file = ""
 
     def start_extract(self):
         model = self.extract_combobox.get()
@@ -201,6 +208,30 @@ class geo_ana_frame(Frame):
             self.adj_sep.grid_forget()
         else:
             self.adj_sep.grid(row=15,column=0,columnspan=2)
+
+    def show_ts_selection_window(self):
+        if self.do_ts_align.get() == True:
+            top = tk.Toplevel()
+            top.wm_title("Timestamp File Selection")
+            gt_ts_label = Label(top,text="Select ground truth timestamp file:")
+            gt_ts_label.grid(row=0,column=0)
+            gt_ts_txt = Entry(top)
+            gt_ts_txt.grid(row=1,column=0,sticky="ew")
+            gt_ts_btn = Button(top,text="Browse...",command=lambda:self.browse_ts(True,gt_ts_txt))
+            gt_ts_btn.grid(row=1,column=1)
+
+            pred_ts_label = Label(top,text="Select prediction timestamp file:")
+            pred_ts_label.grid(row=2,column=0)
+            pred_ts_txt = Entry(top)
+            pred_ts_txt.grid(row=3,column=0,sticky="ew")
+            pred_ts_btn = Button(top,text="Browse...",command=lambda:self.browse_ts(False,pred_ts_txt))
+            pred_ts_btn.grid(row=3,column=1)
+    
+    def browse_ts(self,is_gt,show_widget):
+        if is_gt:
+            self.gt_ts_file = browse_file(show_widget,"Timestamp File","txt")
+        else:
+            self.pred_ts_file = browse_file(show_widget,"Timestamp File","txt")
 
 if __name__ == '__main__':
     geo_ana_frame().mainloop()
