@@ -6,6 +6,7 @@ from PIL import Image,ImageTk,ImageOps
 import glob
 import os
 import shutil
+from datetime import datetime
 
 
 class style_train_ui:
@@ -28,7 +29,7 @@ class style_train_ui:
         self.load_btn.grid(row=5,column=0,sticky="w")
         self.progress = ttk.Progressbar(tab, orient="horizontal")
         self.progress.grid(row=5,column=0,sticky="e",columnspan=2)
-        self.start_btn = Button(tab,text="Start Training",state=DISABLED)
+        self.start_btn = Button(tab,text="Start Training",state=DISABLED,command=lambda:self.start_train())
         self.start_btn.grid(row=5,column=2)
 
         self.preview_sep = ttk.Labelframe(tab, text='Preview')
@@ -106,4 +107,20 @@ class style_train_ui:
         self.start_btn.config(state=NORMAL)
 
     def start_train(self):
-        pass
+        pyenv = get_curr_python()
+        train_name = self.train_name_txt.get()
+        if len(train_name) == 0 or train_name in "Enter name for this weight":
+            train_name = datetime.now().strftime("%Y%m%d-%H%M%S")
+        if pyenv is None:
+            tkinter.messagebox.showerror("Something went wrong: start_eval()->conda python bin not found")
+            return
+        test_command = "cd {} ; {} train.py --name {}"\
+            .format(self.vsait_loc, pyenv, train_name)
+        try:
+            # Training might takes days, depending the dataset size.\n
+            top = make_top_wdnw("Training might takes days, depending the dataset size. \nThis window will close itself when done.")
+            res = subprocess.check_output(test_command,shell=True)
+            top.destroy()
+            tkinter.messagebox.showinfo(title="ckpt Location",message=os.path.join(self.vsait_loc,"checkpoints",train_name,"version_0","checkpoints"))
+        except Exception as e:
+            print(e)
