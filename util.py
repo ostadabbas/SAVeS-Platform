@@ -5,6 +5,7 @@ import re
 import numpy as np
 import os
 from datetime import datetime
+import sys
 
 def set_entry_txt(entry_widget,txt):
     entry_widget.delete(0,END)
@@ -108,3 +109,14 @@ def check_make_folder(folder_to_check):
         # os.rename(dest_fldr_val,os.path.join(dest_fldr,"val_bkup_"+time.))
         os.rename(folder_to_check, f"{folder_to_check}_{timestamp}")
         os.makedirs(folder_to_check)
+
+def get_curr_python():
+    BIN2 = os.path.join(sys.exec_prefix, "bin", "python")
+    if os.path.exists(BIN2):
+        return BIN2
+    else:
+        return None
+
+def on_close():
+        # Do nothing here to prevent the user from closing the window
+    pass

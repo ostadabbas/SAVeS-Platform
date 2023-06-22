@@ -24,7 +24,7 @@ class lbm_test_frame(Frame):
         self.ada = adabins_ui(self.tab_ada)
         self.dpt = dpt_ui(self.tab_dpt)
 
-        self.tabsystem.add(self.tab_geo, text='GeoNet')
+        # self.tabsystem.add(self.tab_geo, text='GeoNet')
         self.tabsystem.add(self.tab_ada, text='AdaBins')
         self.tabsystem.add(self.tab_dpt, text='DPT')
         self.tabsystem.pack(expand=1, fill="both")

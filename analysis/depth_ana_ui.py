@@ -110,9 +110,6 @@ class depth_ana_ui:
             
         top.destroy()
     
-    def on_close(self):
-        # Do nothing here to prevent the user from closing the window
-        pass
     # must be called by extract_img
     def __open_and_cvt(self,gt_folder,start,end,name_arr):
         reshape = (1216,352)
@@ -162,11 +159,11 @@ class depth_ana_ui:
         try:
             top = tk.Toplevel()
             top.wm_title("Halt")
-            top.protocol("WM_DELETE_WINDOW", self.on_close)
+            top.protocol("WM_DELETE_WINDOW", on_close)
             wait_label = Label(top,image=self.img)
             wait_label.image = self.img
             wait_label.grid(row=0,column=0)
-            wait_label2 = Label(top,text="Analysis in progress, this window will close itself when done.")
+            wait_label2 = Label(top,text="Analysis is in progress, this window will close itself when done.")
             wait_label2.grid(row=1,column=0)
             top.update()
             proc = subprocess.check_output(exec_command,stderr=subprocess.STDOUT)

@@ -104,3 +104,6 @@ class style_train_ui:
             self.style_count.config(text="{} image(s)".format(idx))
             idx += 1
         self.start_btn.config(state=NORMAL)
+
+    def start_train(self):
+        pass

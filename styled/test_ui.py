@@ -8,6 +8,9 @@ import os
 import glob
 import shutil
 from datetime import datetime
+import shlex
+import subprocess
+import sys
 
 class style_test_ui:
     def __init__(self,tab) -> None:
@@ -31,7 +34,7 @@ class style_test_ui:
         self.copy_img_btn.grid(row=5,column=0,sticky="e")
         self.dynamic_count_label = Label(tab,text=">>>>>>>>> 0 image(s) >>>>>>>>>")
         self.dynamic_count_label.grid(row=5,column=1)
-        self.transfer_btn = Button(tab,text="Transfer",state=DISABLED)
+        self.transfer_btn = Button(tab,text="Transfer",state=DISABLED,command=lambda:self.start_test())
         self.transfer_btn.grid(row=5,column=2)
         self.progress = ttk.Progressbar(tab, orient="horizontal")
         self.progress.grid(row=5,column=0,sticky="w")
@@ -83,3 +86,15 @@ class style_test_ui:
                 self.dynamic_count_label.config(text=">>>>>>>>> {} image(s) >>>>>>>>>".format(idx))
                 idx += 1
             self.transfer_btn.config(state=NORMAL)
+
+    def start_test(self):
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        ckpt_name = self.model_sel_combo.get()
+        full_pth = os.path.join(self.pre_fldr_txt.get(),ckpt_name)
+        BIN2 = os.path.join(sys.exec_prefix, "bin", "python.exe")
+        # for windows
+        test_command = "D: && cd {} && {} test.py --name=\"{}\" --checkpoint=\"{}\"".format(self.vsait_loc[2:],BIN2[2:],timestamp,full_pth)
+        print(test_command)
+        test_command = shlex.split(test_command)
+        res = subprocess.check_output(test_command,shell=True)
+        print(res.decode("utf-8"))
