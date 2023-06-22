@@ -14,7 +14,7 @@ print(BIN2,is_there)
 # for windows
 # test_command = "cd /D D:/LocalProjects/synthetic2/vsait && D:/Programs/Anaconda/envs/vsait/bin/python.exe test.py --name=\"20230621-191546\" --checkpoint=\"D:/LocalProjects/synthetic2/vsait/checkpoints/all\epoch=26-step=59564.ckpt\""
 # test_command = r"cd D:\\ && cd LocalProjects/synthetic2/vsait && 'D:\\Programs\\Anaconda\\envs\\vsait\\bin\\python.exe'"
-test_command = "cd /mnt/d/LocalProjects/synthetic2/AdaBins/ ; /home/petebai/anaconda3/envs/adabins/bin/python test_demo.py --datapath /mnt/d/LocalProjects/synthetic2/Presil_full/images/content/ --pt_used kitti"
+test_command = "cd /mnt/d/LocalProjects/synthetic2/vsait/ ; /home/petebai/anaconda3/envs/vsait/bin/python test.py --name vsait_adapt --checkpoint /mnt/d/LocalProjects/synthetic2/vsait/checkpoints/all/epoch=26-step=59564.ckpt"
 
 # test_command = shlex.split(test_command)
 print(test_command)

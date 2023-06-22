@@ -70,7 +70,8 @@ class style_frame(Frame):
             res_dict["PyTorch >= 1.11.x"] = False
             model_env_ready = False
         else:
-            if float(tfv[:4]) <= 1.11:
+            main_ver,small_ver,_ = tfv.split(".")
+            if int(small_ver) < 11 or int(main_ver) != 1:
                 res_dict["PyTorch >= 1.11.x"] = False
                 model_env_ready = False
             else:

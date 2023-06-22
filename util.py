@@ -6,6 +6,8 @@ import numpy as np
 import os
 from datetime import datetime
 import sys
+from PIL import Image,ImageTk
+import tkinter as tk
 
 def set_entry_txt(entry_widget,txt):
     entry_widget.delete(0,END)
@@ -120,3 +122,17 @@ def get_curr_python():
 def on_close():
         # Do nothing here to prevent the user from closing the window
     pass
+
+def make_top_wdnw(show_txt):
+    img = Image.open("./images/warn.png")
+    img = ImageTk.PhotoImage(img)
+    top = tk.Toplevel()
+    top.wm_title("Halt")
+    top.protocol("WM_DELETE_WINDOW", on_close)
+    wait_label = Label(top,image=img)
+    wait_label.image = img
+    wait_label.grid(row=0,column=0)
+    wait_label2 = Label(top,text=show_txt)
+    wait_label2.grid(row=1,column=0)
+    top.update()
+    return top

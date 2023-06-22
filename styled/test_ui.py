@@ -91,10 +91,17 @@ class style_test_ui:
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         ckpt_name = self.model_sel_combo.get()
         full_pth = os.path.join(self.pre_fldr_txt.get(),ckpt_name)
-        BIN2 = os.path.join(sys.exec_prefix, "bin", "python.exe")
-        # for windows
-        test_command = "D: && cd {} && {} test.py --name=\"{}\" --checkpoint=\"{}\"".format(self.vsait_loc[2:],BIN2[2:],timestamp,full_pth)
-        print(test_command)
-        test_command = shlex.split(test_command)
-        res = subprocess.check_output(test_command,shell=True)
-        print(res.decode("utf-8"))
+        pyenv = get_curr_python()
+        if pyenv is None:
+            tkinter.messagebox.showerror("Something went wrong: start_eval()->conda python bin not found")
+            return
+        test_command = "cd {} ; {} test.py --name {} --checkpoint {}"\
+        .format(self.vsait_loc, pyenv, timestamp, full_pth)
+        try:
+            # Training might takes days, depending the dataset size.\n
+            top = make_top_wdnw("Transfer is in progress. \nThis window will close itself when done.")
+            res = subprocess.check_output(test_command,shell=True)
+            top.destroy()
+            tkinter.messagebox.showinfo(title="Image Location",message=os.path.join(self.vsait_loc,"checkpoints",timestamp))
+        except Exception as e:
+            print(e)

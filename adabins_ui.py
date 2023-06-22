@@ -105,14 +105,7 @@ class adabins_ui(lbm_model_ui):
             "cd {} ; {} test_demo.py --datapath {} --pt_used {}"\
             .format(ada_loc,env_py,img_pth,curr_pt)
         try:
-            top = tk.Toplevel()
-            top.wm_title("Halt")
-            top.protocol("WM_DELETE_WINDOW", on_close)
-            wait_label = Label(top,image=self.img)
-            wait_label.image = self.img
-            wait_label.grid(row=0,column=0)
-            wait_label2 = Label(top,text="Prediction is in progress, this window will close itself when done.")
-            wait_label2.grid(row=1,column=0)
+            top = make_top_wdnw("Prediction is in progress, this window will close itself when done.")
             top.update()
             res = subprocess.check_output(test_command,shell=True)
             top.destroy()
