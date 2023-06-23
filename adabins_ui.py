@@ -6,6 +6,7 @@ from util import *
 from lbm_model_ui import lbm_model_ui
 from PIL import Image,ImageTk
 import os
+import subprocess
 
 class adabins_ui(lbm_model_ui):
     def __init__(self,tab):
@@ -97,6 +98,10 @@ class adabins_ui(lbm_model_ui):
         env_py = get_curr_python()
         if env_py is None:
             tkinter.messagebox.showerror("Something went wrong: start_eval()->conda python bin not found")
+            return
+        if not os.path.exists(os.path.join(ada_loc,"test_demo.py")):
+            tkinter.messagebox.showerror\
+                ("Something went wrong: \nstart_eval()->test_demo.py not found in {}".format(ada_loc))
             return
         img_pth = self.ada_dataset_txt.get()
         all_pt = {"KITTI":"kitti","NYUv2":"nyu"}

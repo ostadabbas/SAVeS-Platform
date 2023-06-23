@@ -5,15 +5,17 @@ import tkinter.messagebox
 from tkinter import filedialog as fd
 from util import *
 from lbm_model_ui import lbm_model_ui
+import os
+import subprocess
 
 class dpt_ui(lbm_model_ui):
     def __init__(self,tab):
         super().__init__()
         dpt_loc_label = Label(tab,text="Please select DPT installation location:                                                                                   ")
         dpt_loc_label.grid(row=0,column=0,columnspan=3,sticky='w')
-        dpt_loc_txt = Entry(tab)
-        dpt_loc_txt.grid(row=1,column=0,columnspan=3,sticky='ew')
-        dpt_loc_btn = Button(tab,text="Browse...",command=lambda:browse_folder(dpt_loc_txt))
+        self.dpt_loc_txt = Entry(tab)
+        self.dpt_loc_txt.grid(row=1,column=0,columnspan=3,sticky='ew')
+        dpt_loc_btn = Button(tab,text="Browse...",command=lambda:browse_folder(self.dpt_loc_txt))
         dpt_loc_btn.grid(row=1,column=3)
         dpt_loc_mark = checkmark(tab,False)
         dpt_loc_mark.grid(row=1,column=4)
@@ -43,28 +45,65 @@ class dpt_ui(lbm_model_ui):
 
         dpt_dataset_label = Label(tab,text="Please select dataset folder:")
         dpt_dataset_label.grid(row=5,column=0,columnspan=2,sticky='w')
-        dpt_dataset_txt = Entry(tab)
-        dpt_dataset_txt.grid(row=6,column=0,columnspan=3,sticky='ew')
+        self.dpt_dataset_txt = Entry(tab)
+        self.dpt_dataset_txt.grid(row=6,column=0,columnspan=3,sticky='ew')
         dpt_imgamt_label = Label(tab,text=self.get_img_str())
         dpt_imgamt_label.grid(row=6,column=4)
         dpt_dataset_btn = Button(tab,text="Browse...",
-            command=lambda:self.browse_folder_and_count_img(dpt_dataset_txt,dpt_imgamt_label))
+            command=lambda:self.browse_folder_and_count_img(self.dpt_dataset_txt,dpt_imgamt_label))
         dpt_dataset_btn.grid(row=6,column=3)
 
         dpt_chk_env_btn = Button(tab,text="Check Environment", command=lambda:self.check_envs())
         dpt_chk_env_btn.grid(row=7,column=0,sticky='w')
         self.dpt_env_mark = checkmark(tab,False)
         self.dpt_env_mark.grid(row=7,column=1,sticky='w')
-        dpt_start_btn = Button(tab,text="Start")
+        dpt_start_btn = Button(tab,text="Start",command=lambda:self.start_test())
         dpt_start_btn.grid(row=7,column=4,sticky='e')
 
     def check_if_hybrid(self,event):
         select = self.scale_val.get()
-        print(select)
+        # print(select)
         if select == "dpt_hybrid":
             self.dpt_finetune_combo.configure(state=NORMAL)
         else:
             self.dpt_finetune_combo.configure(state=DISABLED)
+
+    def start_test(self):
+        dpt_pth = self.dpt_loc_txt.get()
+        pyenv = get_curr_python()
+        data_pth = self.dpt_dataset_txt.get()
+        if pyenv is None:
+            tkinter.messagebox.showerror("Something went wrong: start_eval()->conda python bin not found")
+            return
+        if not os.path.exists(os.path.join(dpt_pth,"run_monodepth_new.py")):
+            tkinter.messagebox.showerror\
+                ("Something went wrong: \nstart_eval()->run_monodepth_new.py not found in {}".format(dpt_pth))
+            return
+        select = self.scale_val.get()
+        finetune_mdl = self.dpt_finetune_combo.get()
+        final_select = "dpt_hybrid"
+        model_name = "dpt_hybrid-midas-501f0c75.pt"
+        if select == "dpt_large":
+            model_name = "dpt_large-ade20k-b12dca68.pt"
+            final_select = select
+        else:
+            if finetune_mdl in "dpt_hybrid_kitti":
+                model_name = "dpt_hybrid_kitti-cb926ef4.pt"
+            elif finetune_mdl in "dpt_hybrid_nyu":
+                model_name = "dpt_hybrid_nyu-2ce69ec7.pt"
+            final_select = finetune_mdl
+
+        test_command = "cd {} ; {} run_monodepth_new.py -i {} -o . -m {} -t {}"\
+            .format(dpt_pth,pyenv,data_pth,os.path.join(".","weights",model_name),final_select)
+        try:
+            top = make_top_wdnw("Prediction is in progress, this window will close itself when done.")
+            top.update()
+            res = subprocess.check_output(test_command,shell=True)
+            top.destroy()
+            print(res.decode("utf-8"))
+            tkinter.messagebox.showinfo(title="pred.npy Location",message=os.path.join(dpt_pth,"pred.npy"))
+        except Exception as e:
+            print(e)
 
     def check_envs(self):
         # for DPT to work, you are required to have:
@@ -83,7 +122,7 @@ class dpt_ui(lbm_model_ui):
             res_dict["CUDA 10/11"] = False
             model_env_ready = False
         else:
-            if cudav[:2] != "10" or cudav[:2] != "11":
+            if cudav[:2] != "10" and cudav[:2] != "11":
                 res_dict["CUDA 10/11"] = False
                 model_env_ready = False
             else:
