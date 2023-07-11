@@ -105,7 +105,7 @@ class geo_ana_frame(Frame):
         self.check_plot = Checkbutton(self.options_sep, text='Plot Trajectory',variable=self.is_plot)
         self.check_plot.grid(row=14,column=1,sticky='w')
         self.do_ts_align = BooleanVar()
-        self.check_ts = Checkbutton(self.options_sep,text='Align Timestamps',\
+        self.check_ts = Checkbutton(self.options_sep,text='Align No. of Poses',\
                                     variable=self.do_ts_align,command=lambda:self.show_ts_selection_window())
         self.check_ts.grid(row=13,column=2,sticky="w")
         check_start_btn = Button(self.ana_sep,text="Start",command=lambda:self.start_analysis())
@@ -150,10 +150,15 @@ class geo_ana_frame(Frame):
             temp_pred_file = self.adjust_xyz(pred_file)
         else:
             temp_pred_file = pred_file
-        res = geo_ana(gt_file,temp_pred_file,self.is_rpe.get(),self.is_ape.get(),self.is_align.get(),self.is_plot.get())
-        if res == False:
-            tkinter.messagebox.showinfo('Error','An error occured, please refer to commandline output')
+        if self.do_ts_align.get() == True:
+            res = geo_ana(gt_file,temp_pred_file,self.is_rpe.get(),self.is_ape.get(),self.is_align.get(),self.is_plot.get(),True,self.gt_ts_file,self.pred_ts_file)
+        else:
+            res = geo_ana(gt_file,temp_pred_file,self.is_rpe.get(),self.is_ape.get(),self.is_align.get(),self.is_plot.get(),False)
+        if res[0] == False:
+            tkinter.messagebox.showinfo('Error',res[1])
             return
+        else:
+            res = res[1]
         # disp = json.dumps(res)
         disp = ""
         for key, val in res.items():
