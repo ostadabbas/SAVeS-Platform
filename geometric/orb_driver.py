@@ -62,7 +62,7 @@ class orb_driver:
                 print("Output folder path is invalid.")
                 return
         self.output_location = output_location
-        self.filename = filename
+        self.filename = filename + ".txt"
         orb_th = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         orb_th.wait()
         self.copy_to_dest()

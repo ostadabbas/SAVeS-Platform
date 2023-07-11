@@ -37,10 +37,12 @@ class ROSDrivers():
         self.output_location = output_location
         self.is_valid = self.check_ros_install()
     
+
+    #testing noetic
     def check_ros_install(self):
-        direct_output = subprocess.check_output('dpkg -l | grep "ros-melodic" | awk \'{print $2}\'', shell=True)
+        direct_output = subprocess.check_output('dpkg -l | grep "ros-noetic" | awk \'{print $2}\'', shell=True)
         if len(direct_output) == 0:
-            print("ROS melodic is not installed in this system")
+            print("ROS noetic is not installed in this system")
             return False
         else:
             return True

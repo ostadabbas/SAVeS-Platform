@@ -8,7 +8,7 @@ from util import *
 import os
 import json
 
-from extract_from_bag import bag_transform
+from analysis.extract_from_bag import bag_transform
 from analysis.geo_analysis import geo_ana
 import numpy as np
 import copy
@@ -127,13 +127,13 @@ class geo_ana_frame(Frame):
             return
         args = args_pl(bag_file,model,datasets,output_location)
         try:
+            top = make_top_wdnw("Extracting... This window will close itself when done.")
             if model == "A-LOAM":
                 self.bt.extract_from_aloam_bag(args)
-                tkinter.messagebox.showinfo('Completed','Extraction process has sucessfully returned.')
-                # tkinter.messagebox.showinfo('Error','Bag file does not match with model.')
             elif model == "LeGO-LOAM":
                 self.bt.extract_from_lego_bag(args)
-                tkinter.messagebox.showinfo('Completed','Extraction process has sucessfully returned.')
+            top.destroy()
+            tkinter.messagebox.showinfo('Completed','Extraction process has sucessfully returned.')
         except:
             tkinter.messagebox.showinfo('Error','Bag file does not match with model.')
 

@@ -1,4 +1,4 @@
-from ros_drivers import ROSDrivers
+from geometric.ros_drivers import ROSDrivers
 import subprocess
 import os
 from threading import Thread
@@ -18,20 +18,25 @@ class legoloam_driver(ROSDrivers):
         # consider have some output if anything goes wrong, but not for now
         
     def play_bag(self,lidar_topic,imu_topic=None):
+        do_clock = False # found out for carla you dont need this option
+        if do_clock:
+            clock_str = "--clock"
+        else:
+            clock_str = ""
         if self.is_one_bag:
             bag_loc = self.bag_loc
-            play_command = "rosbag play {} --clock {}:=/velodyne_points".format(bag_loc,lidar_topic)
+            play_command = "rosbag play {} {} {}:=/velodyne_points".format(bag_loc,clock_str,lidar_topic)
             if imu_topic is not None:
                 play_command += " {}:=/imu/data".format(imu_topic)
         else:
             if imu_topic is not None:
-                play_command = "rosbag play {} {} --clock {}:=/velodyne_points {}:=/imu/data".format(self.imu_loc,self.lidar_loc,lidar_topic,imu_topic)
+                play_command = "rosbag play {} {} {} {}:=/velodyne_points {}:=/imu/data".format(self.imu_loc,self.lidar_loc,clock_str,lidar_topic,imu_topic)
             else:
-                play_command = "rosbag play {} --clock {}:=/velodyne_points".format(self.lidar_loc,lidar_topic)
-        return play_command
+                play_command = "rosbag play {} {} {}:=/velodyne_points".format(self.lidar_loc,clock_str,lidar_topic)
         # the threading has some issues, will currently return command to execute
-        # self.play_bag_thread = Thread(target=self.play_thread,args=(play_command,))
-        # self.play_bag_thread.start()
+        self.play_bag_thread = Thread(target=self.play_thread,args=(play_command,))
+        self.play_bag_thread.start()
+        return play_command
 
     def collect_result(self,result_name):
         self.rec_thread = multiprocessing.Process(target=self.record_thread, args=(result_name,self.ros_record_thread,))
@@ -52,9 +57,13 @@ class legoloam_driver(ROSDrivers):
         # self.ros_record_thread.wait()
 
     def play_thread(self,play_command):
-        self.bag_thread = subprocess.Popen(play_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        # self.bag_thread = subprocess.Popen(play_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         # res = self.bag_thread.communicate()[0].strip()
         # print(res)
+        play_command = shlex.split(play_command)
+        self.bag_thread = subprocess.Popen(play_command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        res = self.bag_thread.communicate()[0].strip()
+        print(res)
 
     def close_collect(self):
         end_command = "bash -c 'rosnode kill /lol_bag'"

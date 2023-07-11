@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import ttk
 import tkinter.messagebox
 from util import *
-from lbm_model_ui import lbm_model_ui
+from depth.lbm_model_ui import lbm_model_ui
 from PIL import Image,ImageTk
 import os
 import subprocess

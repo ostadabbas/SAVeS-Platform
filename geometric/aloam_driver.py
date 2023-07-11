@@ -1,4 +1,4 @@
-from ros_drivers import ROSDrivers
+from geometric.ros_drivers import ROSDrivers
 import subprocess
 import os
 from threading import Thread

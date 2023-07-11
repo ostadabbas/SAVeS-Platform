@@ -5,9 +5,9 @@ import tkinter.messagebox
 from tkinter import filedialog as fd
 import time
 
-from aloam_driver import aloam_driver
-from legoloam_driver import legoloam_driver
-from orb_driver import orb_driver
+from geometric.aloam_driver import aloam_driver
+from geometric.legoloam_driver import legoloam_driver
+from geometric.orb_driver import orb_driver
 
 class geo_main_frame(Frame):
     def __init__(self):
@@ -379,12 +379,12 @@ class geo_main_frame(Frame):
         prompt_msg = driver.play_bag(topic_name) # fill topic name
         cmd_window = tk.Toplevel()
         cmd_window.wm_title("rosbag play")
-        play_instr = Label(cmd_window,text="Open a new terminal and enter the following command, followed by Enter")
+        play_instr = Label(cmd_window,text="If you didn't see anything on the rviz window, open a new terminal and enter the following command, followed by Enter")
         play_instr.grid(row=0,column=0)
         instr_txt = Text(cmd_window)
         instr_txt.insert(tk.END, prompt_msg)
         instr_txt.grid(row=1,column=0)
-        close_instr = Label(cmd_window,text="Click Finish after running the rosbag play command to collect results")
+        close_instr = Label(cmd_window,text="Click Finish after running the rosbag play command to collect results, then close rviz window")
         close_instr.grid(row=2,column=0)
         close_btn = Button(cmd_window,text="Finish",command=lambda:self.close_collect(cmd_window,driver))
         close_btn.grid(row=3,column=0,columnspan=2,sticky='ew')

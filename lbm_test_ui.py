@@ -5,9 +5,9 @@ import tkinter.messagebox
 from tkinter import filedialog as fd
 import time
 
-from geonet_ui import geonet_test_ui
-from adabins_ui import adabins_ui
-from dpt_ui import dpt_ui
+from depth.geonet_ui import geonet_test_ui
+from depth.adabins_ui import adabins_ui
+from depth.dpt_ui import dpt_ui
 
 class lbm_test_frame(Frame):
     def __init__(self):

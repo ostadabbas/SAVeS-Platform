@@ -4,7 +4,7 @@ from tkinter import ttk
 import tkinter.messagebox
 from tkinter import filedialog as fd
 from util import *
-from lbm_model_ui import lbm_model_ui
+from depth.lbm_model_ui import lbm_model_ui
 import os
 import subprocess
 
