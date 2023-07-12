@@ -66,8 +66,8 @@ class adabins_ui(lbm_model_ui):
             res_dict["CUDA 10/11"] = False
             model_env_ready = False
         else:
-            if cudav[:2] != "10" and cudav[:2] != "11":
-                res_dict["CUDA 10/11"] = False
+            if cudav[:2] != "10" and cudav[:2] != "11" and cudav[:2] != "12":
+                res_dict["CUDA 10-12"] = False
                 model_env_ready = False
             else:
                 res_dict["CUDA {}".format(cudav)] = True
@@ -80,7 +80,11 @@ class adabins_ui(lbm_model_ui):
                 res_dict["PyTorch > 1.8.x"] = False
                 model_env_ready = False
             else:
-                res_dict["Pytorch {}".format(tfv)] = True
+                if test_torch_cuda():
+                    res_dict["Pytorch {}".format(tfv)] = True
+                else:
+                    res_dict["PyTorch > 1.8.x"] = False
+                    model_env_ready = False
         if pyv == -1:
             res_dict["Python >= 3.5"] = False
             model_env_ready = False

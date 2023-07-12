@@ -33,7 +33,8 @@ def browse_file(show_widget,ext_desc,ext,start_dir='~/Downloads'):
 
 def checkmark(parent,val):
     if not val:
-        return Label(parent,text="✕",fg='red')
+        widget = Label(parent,text="✕",fg='red')
+        return widget
     else:
         return Label(parent,text="✓",fg='green')
 
@@ -69,6 +70,16 @@ def get_mllib_version(package):
         return ret
     except:
         return -1
+    
+def test_torch_cuda():
+    result = True
+    try:
+        import torch
+        result = torch.cuda.is_available()
+    except Exception as e:
+        tk.messagebox.showerror(e)
+        result = False
+    return result
 
 def get_python_version():
     command = "python --version"
