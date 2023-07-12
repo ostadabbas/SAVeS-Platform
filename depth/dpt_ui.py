@@ -17,8 +17,8 @@ class dpt_ui(lbm_model_ui):
         self.dpt_loc_txt.grid(row=1,column=0,columnspan=3,sticky='ew')
         dpt_loc_btn = Button(tab,text="Browse...",command=lambda:browse_folder(self.dpt_loc_txt))
         dpt_loc_btn.grid(row=1,column=3)
-        dpt_loc_mark = checkmark(tab,False)
-        dpt_loc_mark.grid(row=1,column=4)
+        # dpt_loc_mark = checkmark(tab,False)
+        # dpt_loc_mark.grid(row=1,column=4)
 
         self.scale_val = StringVar()
         self.hybrid_val = StringVar()
@@ -34,14 +34,14 @@ class dpt_ui(lbm_model_ui):
         dpt_scale_combo.bind('<<ComboboxSelected>>', self.check_if_hybrid)
         # dpt_finetune_combo.configure(state=DISABLED)
 
-        dpt_pretrain_label = Label(tab,text="Please select the pretrained weights file:")
-        dpt_pretrain_label.grid(row=3,column=0,columnspan=3,sticky='w')
-        dpt_pretrain_txt = Entry(tab)
-        dpt_pretrain_txt.grid(row=4,column=0,columnspan=3,sticky='ew')
-        dpt_pretrain_btn = Button(tab,text="Browse...",command=lambda:self.load_pretrain(dpt_pretrain_txt,"pt"))
-        dpt_pretrain_btn.grid(row=4,column=3)
-        dpt_pretrain_mark = checkmark(tab,False)
-        dpt_pretrain_mark.grid(row=4,column=4)
+        # dpt_pretrain_label = Label(tab,text="Please select the pretrained weights file:")
+        # dpt_pretrain_label.grid(row=3,column=0,columnspan=3,sticky='w')
+        # dpt_pretrain_txt = Entry(tab)
+        # dpt_pretrain_txt.grid(row=4,column=0,columnspan=3,sticky='ew')
+        # dpt_pretrain_btn = Button(tab,text="Browse...",command=lambda:self.load_pretrain(dpt_pretrain_txt,"pt"))
+        # dpt_pretrain_btn.grid(row=4,column=3)
+        # dpt_pretrain_mark = checkmark(tab,False)
+        # dpt_pretrain_mark.grid(row=4,column=4)
 
         dpt_dataset_label = Label(tab,text="Please select dataset folder:")
         dpt_dataset_label.grid(row=5,column=0,columnspan=2,sticky='w')
@@ -82,19 +82,14 @@ class dpt_ui(lbm_model_ui):
         select = self.scale_val.get()
         finetune_mdl = self.dpt_finetune_combo.get()
         final_select = "dpt_hybrid"
-        model_name = "dpt_hybrid-midas-501f0c75.pt"
         if select == "dpt_large":
-            model_name = "dpt_large-ade20k-b12dca68.pt"
             final_select = select
         else:
-            if finetune_mdl in "dpt_hybrid_kitti":
-                model_name = "dpt_hybrid_kitti-cb926ef4.pt"
-            elif finetune_mdl in "dpt_hybrid_nyu":
-                model_name = "dpt_hybrid_nyu-2ce69ec7.pt"
-            final_select = finetune_mdl
+            if finetune_mdl in "dpt_hybrid_nyu" or finetune_mdl in "dpt_hybrid_kitti":
+                final_select = finetune_mdl
 
-        test_command = "cd {} ; {} run_monodepth_new.py -i {} -o . -m {} -t {}"\
-            .format(dpt_pth,pyenv,data_pth,os.path.join(".","weights",model_name),final_select)
+        test_command = "cd {} ; {} run_monodepth_new.py -i {} -o . -t {}"\
+            .format(dpt_pth,pyenv,data_pth,final_select)
         try:
             top = make_top_wdnw("Prediction is in progress, this window will close itself when done.")
             top.update()
@@ -119,23 +114,28 @@ class dpt_ui(lbm_model_ui):
         timmv = get_mllib_version("timm")
         pyv = get_python_version()
         if cudav == -1:
-            res_dict["CUDA 10/11"] = False
+            res_dict["CUDA 10-12"] = False
             model_env_ready = False
         else:
-            if cudav[:2] != "10" and cudav[:2] != "11":
-                res_dict["CUDA 10/11"] = False
+            if cudav[:2] != "10" and cudav[:2] != "11" and cudav[:2] != "12":
+                res_dict["CUDA 10-12"] = False
                 model_env_ready = False
             else:
                 res_dict["CUDA {}".format(cudav)] = True
         if tfv == -1:
-            res_dict["PyTorch 1.8.x"] = False
+            res_dict["PyTorch >= 1.8.x"] = False
             model_env_ready = False
         else:
-            if tfv[:3] != "1.8":
-                res_dict["PyTorch 1.8.x"] = False
+            main_v,small_v,_ = tfv.split(".")
+            if int(small_v) <= 8 or int(main_v) != 1:
+                res_dict["PyTorch >= 1.8.x"] = False
                 model_env_ready = False
             else:
-                res_dict["Pytorch {}".format(tfv)] = True
+                if test_torch_cuda():
+                    res_dict["Pytorch {}".format(tfv)] = True
+                else:
+                    res_dict["PyTorch > 1.8.x"] = False
+                    model_env_ready = False
         if timmv == -1:
             res_dict["timm 0.4.5"] = False
             model_env_ready = False
