@@ -37,7 +37,8 @@ class style_frame(Frame):
         self.env_chkmark.grid(row=2,column=2)
 
         self.tabsystem.pack(expand=1, fill=tk.Y)
-        self.__hide_all_tabs(False)
+        # for debug purpose
+        # self.__hide_all_tabs(False)
     def __hide_all_tabs(self,do_hide):
         if do_hide:
             self.tabsystem.hide(self.tab_train)
@@ -58,11 +59,11 @@ class style_frame(Frame):
         pyv = get_python_version()
         lightningv = get_mllib_version("pytorch-lightning")
         if cudav == -1:
-            res_dict["CUDA 11"] = False
+            res_dict["CUDA 11-12"] = False
             model_env_ready = False
         else:
-            if cudav[:2] != "11":
-                res_dict["CUDA 11"] = False
+            if cudav[:2] != "11" and cudav[:2] != "12":
+                res_dict["CUDA 11-12"] = False
                 model_env_ready = False
             else:
                 res_dict["CUDA {}".format(cudav)] = True
@@ -75,7 +76,11 @@ class style_frame(Frame):
                 res_dict["PyTorch >= 1.11.x"] = False
                 model_env_ready = False
             else:
-                res_dict["Pytorch {}".format(tfv)] = True
+                if test_torch_cuda():
+                    res_dict["Pytorch {}".format(tfv)] = True
+                else:
+                    res_dict["PyTorch > 1.8.x"] = False
+                    model_env_ready = False
         if pyv == -1:
             res_dict["Python >= 3.8"] = False
             model_env_ready = False

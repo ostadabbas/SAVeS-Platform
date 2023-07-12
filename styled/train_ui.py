@@ -44,8 +44,8 @@ class style_train_ui:
         self.style_img_label.grid(row=7,column=2)
         self.content_count = Label(self.preview_sep,text="0 image(s)")
         self.content_count.grid(row=8,column=0)
-        self.style_count = Label(self.preview_sep,text="0 image(s)")
-        self.style_count.grid(row=8,column=2)
+        # self.style_count = Label(self.preview_sep,text="0 image(s)")
+        # self.style_count.grid(row=8,column=2)
 
         content_btn = Button(tab,text="Browse...",command=lambda:self.browse_img_folder(self.content_txt,self.content_img_label))
         content_btn.grid(row=1,column=2)
@@ -102,7 +102,7 @@ class style_train_ui:
             perc = int(idx*100 / count)
             self.progress["value"] = perc
             self.progress.update()
-            self.style_count.config(text="{} image(s)".format(idx))
+            # self.style_count.config(text="{} image(s)".format(idx))
             idx += 1
         self.start_btn.config(state=NORMAL)
 
