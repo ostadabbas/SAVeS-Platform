@@ -3,6 +3,7 @@ import subprocess
 from threading import Thread
 import time
 import shutil
+from analysis.geo_analysis import cvt_tum_kitti
 
 class orb_driver:
     def __init__(self,orb_location,yaml_location):
@@ -62,7 +63,7 @@ class orb_driver:
                 print("Output folder path is invalid.")
                 return
         self.output_location = output_location
-        self.filename = filename + ".txt"
+        self.filename = filename
         orb_th = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         orb_th.wait()
         self.copy_to_dest()
@@ -73,7 +74,8 @@ class orb_driver:
         if not os.path.exists(source_file):
             print("No trajectory file detected!")
             return
-        res = shutil.copyfile(source_file,dest_file)
+        # res = shutil.copyfile(source_file,dest_file)
+        cvt_tum_kitti(source_file,dest_file)
 
 if __name__ == '__main__':
     a = orb_driver("/home/petebai/orbslam3/ORB_SLAM3","/home/petebai/orbslam3/ORB_SLAM3/Examples/Stereo/carla2.2.yaml")

@@ -67,3 +67,12 @@ def geo_ana(gt_file,pred_file,do_rpe,do_ape,do_align,do_plot,do_ts,gt_ts=None,pr
         return (True,result)
     except Exception as e:
         return (False,e)
+
+def cvt_tum_kitti(tum_traj_txt,dest_kitti_loc):
+    traj_tum = file_interface.read_tum_trajectory_file(tum_traj_txt)
+    file_interface.write_kitti_poses_file(dest_kitti_loc+".txt", traj_tum)
+    with open(tum_traj_txt,"r") as f:
+        cont = f.readlines()
+    with open(dest_kitti_loc+"y_timestamps.txt","w") as f:
+        for line in cont:
+            f.write(line.split(" ")[0] + "\n")
