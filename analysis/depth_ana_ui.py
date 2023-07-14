@@ -13,6 +13,7 @@ import math
 import threading
 import time
 import shlex
+import shutil
 
 class depth_ana_ui:
     def __init__(self, tab) -> None:
@@ -54,21 +55,15 @@ class depth_ana_ui:
         if self.npy_loc_txt.get() == "" or self.gt_loc_txt.get() == "":
             print("empty container")
             return
-        top = tk.Toplevel()
-        top.wm_title("Halt")
-        top.protocol("WM_DELETE_WINDOW", self.on_close)
-        wait_img = Label(top,image=self.img)
-        wait_img.image = self.img
-        wait_img.grid(row=0,column=0)
-        wait_label = Label(top, text="Extraction in progress, this window will close itself when done.")
-        wait_label.grid(row=1,column=0)
-        top.update()
+        top = make_top_wdnw("Extraction in progress, this window will close itself when done.")
         # do something time consuming but exact time can't be determined
-            
         if extract_loc is None:
             self.fldr_name = self.npy_loc_txt.get().split("/")[-1] + "_extract"
             self.fldr_path = os.path.join(".","extracted",self.fldr_name)
             if not os.path.exists(self.fldr_path):
+                os.makedirs(self.fldr_path)
+            else:
+                shutil.rmtree(self.fldr_path)
                 os.makedirs(self.fldr_path)
             self.dest_fldr = self.fldr_path
         else:
@@ -78,22 +73,20 @@ class depth_ana_ui:
         self.num_img = self.img_coll.shape[0]
         # start assign workload
         thread_ct = 8
-        each_thread_ct = math.ceil((self.num_img-10)/thread_ct)
         threads_handle = []
         name_arr = list(os.listdir(self.gt_loc_txt.get()))
         name_arr.sort()
-        # with open("img_seq.txt",'r') as f:
-        #     name_arr = f.readlines()
-        # tkinter.messagebox.showinfo('Attention','This window will close itself when extraction is finished!')
         for th_ct in range(thread_ct):
             if self.cut_head:
+                each_thread_ct = math.ceil((self.num_img-10)/thread_ct)
                 start = 5 + th_ct * each_thread_ct
-                end = 5+(th_ct+1)*each_thread_ct
+                end = 5 + (th_ct+1)*each_thread_ct
                 # for the last thread
                 if th_ct == thread_ct-1:
                     if end != self.num_img - 5:
                         end = self.num_img - 5
             else:
+                each_thread_ct = math.ceil(self.num_img/thread_ct)
                 start = th_ct * each_thread_ct
                 end = (th_ct+1)*each_thread_ct
                 # for the last thread
@@ -112,14 +105,19 @@ class depth_ana_ui:
     
     # must be called by extract_img
     def __open_and_cvt(self,gt_folder,start,end,name_arr):
-        reshape = (1216,352)
         for i in range(start, end):
+            curr_name = name_arr[i-5] if self.cut_head else name_arr[i]
             if i % 100 == 0:
                 print(i)
-            gt = np.array(Image.open(gt_folder+"/"+name_arr[i]))
-            interm_img = cv2.resize(self.img_coll[i],reshape,interpolation=cv2.INTER_LINEAR)
-            new_img = scale_matching(gt,interm_img)
-            imageio.imwrite(self.dest_fldr+"/"+name_arr[i], new_img.astype(np.uint16))
+            gt = np.array(Image.open(gt_folder+"/"+curr_name))
+            # print(gt.shape,self.img_coll[i].shape)
+            if gt.shape[0] == self.img_coll[i].shape[0] and gt.shape[1] == self.img_coll[i].shape[1]:
+                interm_img = np.float32(self.img_coll[i])
+            else:
+                interm_img = cv2.resize(np.float32(self.img_coll[i]),(gt.shape[1],gt.shape[0]),interpolation=cv2.INTER_LINEAR)
+            new_img = scale_matching(gt,interm_img).astype(np.uint16)
+            
+            imageio.imwrite(self.dest_fldr+"/"+curr_name, new_img)
 
     def validate_ct(self,is_npy):
         if is_npy:
