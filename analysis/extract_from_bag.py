@@ -33,7 +33,7 @@ class bag_transform():
         if not os.path.exists(args.bag_file):
             return False
         b = bagreader(args.bag_file)
-        odo_msg = b.message_by_topic('/aft_mapped_to_init_corrected')
+        odo_msg = b.message_by_topic('/aft_mapped_to_init')
         df_odo = pd.read_csv(odo_msg)
         # print(df_odo.dtypes)
         self.extract_time_from_topic(df_odo,args.output_location,"{}_{}_timestamps.txt".format(args.model,args.datasets))

@@ -15,7 +15,7 @@ class aloam_driver(ROSDrivers):
         self.new_thread = Thread(target=self.ros_thread,args=(loam_location,launch_profile))
         self.new_thread.start()
         
-    def play_bag(self,lidar_topic):
+    def play_bag(self,lidar_topic,do_clock=False):
         lidar_loc = self.bag_loc if self.is_one_bag else self.lidar_loc
         play_command = "rosbag play {} {}:=/velodyne_points".format(lidar_loc,lidar_topic)
         # the threading has some issues, will currently return command to execute
@@ -48,6 +48,10 @@ class aloam_driver(ROSDrivers):
     
     def close_collect(self):
         end_command = "bash -c 'rosnode kill /lol_bag2'"
+        end_command = shlex.split(end_command)
+        proc = subprocess.call(end_command)
+        time.sleep(5)
+        end_command = "bash -c 'rosnode kill -a'"
         end_command = shlex.split(end_command)
         proc = subprocess.call(end_command)
         

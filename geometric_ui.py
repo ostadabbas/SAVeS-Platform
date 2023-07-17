@@ -74,6 +74,10 @@ class geo_main_frame(Frame):
                       variable=self.is_one_bag,onvalue=True,offvalue=False,
                       command=self.show_lidar_imu_location_selection)
         is_one_bag_btn.grid(row=0,column=0)
+        self.is_kitti = BooleanVar()
+        is_kitti_btn = Checkbutton(self.tab_legoloam, text="Bag is KITTI",
+                      variable=self.is_kitti,onvalue=True,offvalue=False)
+        is_kitti_btn.grid(row=0,column=1)
         self.bag_txt = Entry(self.tab_legoloam)
         self.bag_txt.grid(row=1,column=1)
         self.bag_label = Label(self.tab_legoloam,text="Please select bag file location:")
@@ -376,7 +380,7 @@ class geo_main_frame(Frame):
         self.play_cmd_popup(self.ros_drv,topic_name)
 
     def play_cmd_popup(self,driver,topic_name):
-        prompt_msg = driver.play_bag(topic_name) # fill topic name
+        prompt_msg = driver.play_bag(topic_name,do_clock=self.is_kitti.get()) # fill topic name
         cmd_window = tk.Toplevel()
         cmd_window.wm_title("rosbag play")
         play_instr = Label(cmd_window,text="If you didn't see anything on the rviz window, open a new terminal and enter the following command, followed by Enter")

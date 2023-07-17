@@ -13,6 +13,10 @@ def geo_ts_align(gt_file,gt_ts,pred_ts):
     pred_ts_arr = np.loadtxt(pred_ts)
     with open(gt_file, 'r') as f:
         gt_lines = f.readlines()
+
+    # make pred time start same with gt
+    diff = pred_ts_arr[0] - gt_ts_arr[0]
+    pred_ts_arr = pred_ts_arr - diff
     # for each ts in pred, find the close one in gt
     new_gt_lines = []
     for idx, pred_ts_entry in enumerate(pred_ts_arr):

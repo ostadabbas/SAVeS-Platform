@@ -134,8 +134,8 @@ class geo_ana_frame(Frame):
                 self.bt.extract_from_lego_bag(args)
             top.destroy()
             tkinter.messagebox.showinfo('Completed','Extraction process has sucessfully returned.')
-        except:
-            tkinter.messagebox.showinfo('Error','Bag file does not match with model.')
+        except Exception as e:
+            tkinter.messagebox.showinfo('Error',e)
 
     def start_analysis(self):
         gt_file = self.gt_txt.get()
@@ -146,7 +146,7 @@ class geo_ana_frame(Frame):
         if not os.path.exists(pred_file):
             tkinter.messagebox.showinfo('Error','Not valid prediction path!')
             return
-        if self.is_align.get() == True:
+        if self.is_align.get() == False:
             temp_pred_file = self.adjust_xyz(pred_file)
         else:
             temp_pred_file = pred_file

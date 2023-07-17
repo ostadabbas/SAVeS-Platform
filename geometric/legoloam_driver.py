@@ -17,8 +17,8 @@ class legoloam_driver(ROSDrivers):
         self.ros_record_thread = []
         # consider have some output if anything goes wrong, but not for now
         
-    def play_bag(self,lidar_topic,imu_topic=None):
-        do_clock = False # found out for carla you dont need this option
+    def play_bag(self,lidar_topic,imu_topic=None,do_clock=False):
+        # do_clock = True # found out for carla you dont need this option, but for kitti you kinda do??
         if do_clock:
             clock_str = "--clock"
         else:
@@ -50,7 +50,7 @@ class legoloam_driver(ROSDrivers):
         self.ros_main_thread.wait()
 
     def record_thread(self,result_name,proc_list):
-        exec_command = "bash -c 'cd {} ; rosbag record -O {} /aft_mapped_to_init_corrected __name:=lol_bag'".format(self.output_location, result_name)
+        exec_command = "bash -c 'cd {} ; rosbag record -O {} /aft_mapped_to_init __name:=lol_bag'".format(self.output_location, result_name)
         exec_command = shlex.split(exec_command)
         proc = subprocess.Popen(exec_command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         proc_list.append(proc.pid)
@@ -67,6 +67,10 @@ class legoloam_driver(ROSDrivers):
 
     def close_collect(self):
         end_command = "bash -c 'rosnode kill /lol_bag'"
+        end_command = shlex.split(end_command)
+        proc = subprocess.call(end_command)
+        time.sleep(5)
+        end_command = "bash -c 'rosnode kill -a'"
         end_command = shlex.split(end_command)
         proc = subprocess.call(end_command)
         
